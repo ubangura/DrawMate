@@ -1,15 +1,37 @@
 from config import CANVAS_WIDTH_IN_MILLIMETERS, CANVAS_HEIGHT_IN_MILLIMETERS
 from GCodeConverter import GCodeConverter
+from DrawMateStreamer import DrawMateStreamer
 from pathlib import Path
 
 
 def main():
-    gcode_converter = GCodeConverter(Path(__file__).parent / "assets",
-                                     CANVAS_WIDTH_IN_MILLIMETERS,
-                                     CANVAS_HEIGHT_IN_MILLIMETERS
-                                     )
-    svg_file_path = gcode_converter.raster_to_svg(Path("assets/bird.jpg"))
-    gcode_converter.svg_to_gcode(svg_file_path)
+    # === Configuration ===
+    ASSET_DIR = Path(__file__).parent / "assets"
+    INPUT_IMAGE = ASSET_DIR / "bird.jpg"
+    SERIAL_PORT = "/dev/ttyACM0"   # Change this for your system (e.g., COM3 on Windows)
+    BAUD_RATE = 115200
+
+    # === Conversion pipeline ===
+    gcode_converter = GCodeConverter(
+        ASSET_DIR,
+        CANVAS_WIDTH_IN_MILLIMETERS,
+        CANVAS_HEIGHT_IN_MILLIMETERS
+    )
+
+    print("🖼️  Step 1: Converting raster to SVG...")
+    svg_file_path = gcode_converter.raster_to_svg(INPUT_IMAGE)
+
+    print("⚙️  Step 2: Converting SVG to G-code...")
+    gcode_path = gcode_converter.svg_to_gcode(svg_file_path)
+
+    print(f"✅ G-code file created: {gcode_path}")
+
+    # === Stream to DrawMate ===
+    print("📡 Step 3: Streaming G-code to DrawMate...")
+    streamer = DrawMateStreamer(SERIAL_PORT, baudrate=BAUD_RATE)
+    streamer.stream_gcode(gcode_path)
+
+    print("🎉 Done! The DrawMate should now be plotting.")
 
 
 if __name__ == "__main__":
