@@ -19,12 +19,17 @@ class GCodeConverter:
     4. SVG → G-code (vpype-gcode)
     """
 
-    def __init__(self, asset_directory: Path, canvas_width_in_millimeters: float, canvas_height_in_millimeters: float):
+    def __init__(self,
+                 asset_directory: Path,
+                 gcode_directory: Path,
+                 canvas_width_in_millimeters: float,
+                 canvas_height_in_millimeters: float
+                 ):
         self.canvas_width_in_millimeters = canvas_width_in_millimeters
         self.canvas_height_in_millimeters = canvas_height_in_millimeters
 
         self.asset_directory = asset_directory
-        self.gcode_directory = Path(__file__).parent / "gcode"
+        self.gcode_directory = gcode_directory
         self.gcode_directory.mkdir(exist_ok=True)
 
     def raster_to_svg(self, input_image_path: Path) -> Path:

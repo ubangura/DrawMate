@@ -1,4 +1,4 @@
-from config import CANVAS_WIDTH_IN_MILLIMETERS, CANVAS_HEIGHT_IN_MILLIMETERS
+from config import ASSET_DIR, BAUD_RATE, CANVAS_WIDTH_IN_MILLIMETERS, CANVAS_HEIGHT_IN_MILLIMETERS, GCODE_DIR, SERIAL_PORT, SERIAL_TIMEOUT_IN_SECONDS
 from GCodeConverter import GCodeConverter
 from DrawMateStreamer import DrawMateStreamer
 from pathlib import Path
@@ -6,9 +6,6 @@ import sys
 
 
 def main():
-    # === Configuration ===
-    ASSET_DIR = Path(__file__).parent / "assets"
-
     # Check for command-line argument
     if len(sys.argv) > 1:
         INPUT_IMAGE = Path(sys.argv[1])
@@ -20,12 +17,10 @@ def main():
         INPUT_IMAGE = ASSET_DIR / "bird.jpg"
         print(f"🖼️ No image argument provided. Using default: {INPUT_IMAGE}")
 
-    SERIAL_PORT = "/dev/ttyACM0"   # Change for your setup (e.g., COM3 on Windows)
-    BAUD_RATE = 115200
-
     # === Conversion pipeline ===
     gcode_converter = GCodeConverter(
         ASSET_DIR,
+        GCODE_DIR,
         CANVAS_WIDTH_IN_MILLIMETERS,
         CANVAS_HEIGHT_IN_MILLIMETERS
     )
@@ -40,7 +35,7 @@ def main():
 
     # === Stream to DrawMate ===
     print("📡 Step 3: Streaming G-code to DrawMate...")
-    streamer = DrawMateStreamer(SERIAL_PORT, baudrate=BAUD_RATE)
+    streamer = DrawMateStreamer(SERIAL_PORT, BAUD_RATE, SERIAL_TIMEOUT_IN_SECONDS)
     streamer.stream_gcode(gcode_path)
 
     print("🎉 Done! The DrawMate should now be plotting.")
