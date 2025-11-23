@@ -7,4 +7,4 @@ segment_first = "G00 X{x:.4f} Y{y:.4f}\n"
 segment = "G01 X{x:.4f} Y{y:.4f}\n"
 unit = "mm"
 vertical_flip = true
-info= "This gcode profile is correctly set for DrawMate"
+info= "This gcode profile is correctly set for DrawMate."
