@@ -1,0 +1,10 @@
+# G-code profile to ensure GRBL compatability
+
+[gwrite.drawmate]
+document_start = "F600\nG21\nG17\nG90\n"
+document_end = "M2\n"
+segment_first = "G00 X{x:.4f} Y{y:.4f}\n"
+segment = "G01 X{x:.4f} Y{y:.4f}\n"
+unit = "mm"
+vertical_flip = true
+info= "This gcode profile is correctly set for DrawMate"
