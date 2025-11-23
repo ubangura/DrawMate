@@ -8,9 +8,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ASSET_DIR = PROJECT_ROOT / "assets"
 GCODE_DIR = PROJECT_ROOT / "gcode"
 
-# Canvas Dimensions (A4 paper)
-CANVAS_WIDTH_IN_MILLIMETERS = 210
-CANVAS_HEIGHT_IN_MILLIMETERS = 297
+# Canvas Dimensions (US Letter paper with 1 inch margins)
+CANVAS_WIDTH_IN_MILLIMETERS = 190
+CANVAS_HEIGHT_IN_MILLIMETERS = 254
 
 # Serial Communication
 SERIAL_PORT = "/dev/ttyACM0"
