@@ -113,9 +113,10 @@ class GCodeConverter:
         try:
             subprocess.run([
                 "vpype",
+                "--config", str(Path("./config/drawmate.toml")),
                 "read", str(input_svg_path),
                 "gwrite",
-                "--profile", "gcode",
+                "--profile", "drawmate",
                 str(output_gcode_path),
             ], check=True, capture_output=True, text=True
             )
