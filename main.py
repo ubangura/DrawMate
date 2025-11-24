@@ -1,6 +1,8 @@
-from config.config import ASSET_DIR, BAUD_RATE, CANVAS_WIDTH_IN_MILLIMETERS, CANVAS_HEIGHT_IN_MILLIMETERS, GCODE_DIR, SERIAL_PORT, SERIAL_TIMEOUT_IN_SECONDS
+from config.config import ASSET_DIR, BAUD_RATE, CANVAS_WIDTH_IN_MILLIMETERS, CANVAS_HEIGHT_IN_MILLIMETERS, CONFIG_DIR, GCODE_DIR, SERIAL_PORT, SERIAL_TIMEOUT_IN_SECONDS
 from GCodeConverter import GCodeConverter
 from DrawMateStreamer import DrawMateStreamer
+from LineArtGenerator import LineArtGenerator
+from google.genai import errors
 from pathlib import Path
 import sys
 
@@ -39,6 +41,24 @@ def main():
     streamer.stream_gcode(gcode_path)
 
     print("🎉 Done! The DrawMate should now be plotting.")
+
+    # === AI Line Art Generation ===
+    line_art_generator = LineArtGenerator()
+
+    try:
+        output_path = line_art_generator.generate(
+            Path(ASSET_DIR / "bird_canny.png"),
+            Path(CONFIG_DIR / "LineArtContinuationPrompt.md")
+        )
+
+        if output_path is None:
+            print("No image generated in response")
+        else:
+            print(f"Line art generated: {output_path}")
+    except errors.APIError as e:
+        print(f"API Error: {e.code}: {e.message}")
+    except FileNotFoundError as e:
+        print(e)
 
 
 if __name__ == "__main__":
