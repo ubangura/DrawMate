@@ -1,12 +1,15 @@
 beautifulsoup4==4.14.2
+charset-normalizer==3.4.4
 dotenv==0.9.9
 future==1.0.0
 google==3.0.0
 iso8601==2.1.0
 numpy==2.2.6
 opencv-contrib-python==4.12.0.88
+pillow==12.0.0
 python-dotenv==1.2.1
 PyYAML==6.0.3
+reportlab==4.4.5
 serial==0.0.97
 soupsieve==2.8
 typing_extensions==4.15.0
