@@ -3,8 +3,16 @@
 [gwrite.drawmate]
 document_start = "F600\nG21\nG17\nG90\n"
 document_end = "M2\n"
-segment_first = "G00 X{x:.4f} Y{y:.4f}\n"
+segment_first = '''
+G01 Z10  ; pen up
+G01 X{x:.4f} Y{y:.4f}\n
+'''
 segment = "G01 X{x:.4f} Y{y:.4f}\n"
+
+segment_last = '''
+G01 X{x:.4f} Y{y:.4f}
+G01 Z-15  ; pen up
+'''
 unit = "mm"
 vertical_flip = true
 info= "This gcode profile is correctly set for DrawMate."
