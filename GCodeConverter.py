@@ -80,7 +80,7 @@ class GCodeConverter:
                 "linesimplify", "--tolerance", "0.2mm",
                 "linemerge",
                 "linesort",
-                "layout", f"{self.canvas_width_in_millimeters}x{self.canvas_height_in_millimeters}mm",
+                "layout", "-m 3mm", "--landscape", f"{self.canvas_width_in_millimeters}x{self.canvas_height_in_millimeters}mm",
                 "write", str(output_svg_path),
             ], check=True, capture_output=True, text=True
             )
