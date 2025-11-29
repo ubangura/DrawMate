@@ -15,8 +15,8 @@ GCODE_DIR = PROJECT_ROOT / "gcode"
 CONFIG_DIR = PROJECT_ROOT / "config"
 
 # Canvas Dimensions (US Letter paper with 1-inch margins)
-CANVAS_WIDTH_IN_MILLIMETERS = 190
-CANVAS_HEIGHT_IN_MILLIMETERS = 254
+CANVAS_WIDTH_IN_MILLIMETERS = 230
+CANVAS_HEIGHT_IN_MILLIMETERS = 170
 
 # AI Configuration
 AI_MODEL = "gemini-2.5-flash-image"
