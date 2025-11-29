@@ -1,18 +1,34 @@
 # G-code profile to ensure GRBL compatability
 
-[gwrite.drawmate]
-document_start = "F600\nG21\nG17\nG90\n"
-document_end = "M2\n"
-segment_first = '''
-G01 Z10  ; pen up
-G01 X{x:.4f} Y{y:.4f}\n
+document_start = '''
+F1000
+G21
+G17
+G90
+$H
+G0 Z10; pen up
+G0 X0 Y0; move to origin
 '''
-segment = "G01 X{x:.4f} Y{y:.4f}\n"
+
+document_end = '''
+G0 Z10; pen up
+G0 X0 Y0
+M2'''
+
+# Handle everything in segment_first
+segment_first = '''
+G0 Z10 ; pen up for travel
+G0 X{x:.4f} Y{y:.4f} ; travel to start
+G0 Z0 ; pen down for drawing
+'''
+
+segment = "G1 X{x:.4f} Y{y:.4f}\n"
 
 segment_last = '''
-G01 X{x:.4f} Y{y:.4f}
-G01 Z-15  ; pen up
+G1 X{x:.4f} Y{y:.4f}
+G0 Z10 ; pen up after path
 '''
+
 unit = "mm"
 vertical_flip = true
 info= "This gcode profile is correctly set for DrawMate."
