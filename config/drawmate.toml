@@ -1,5 +1,6 @@
 # G-code profile to ensure GRBL compatability
 
+[gwrite.drawmate]
 document_start = '''
 F1000
 G21
