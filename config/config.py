@@ -22,9 +22,6 @@ CANVAS_HEIGHT_IN_MILLIMETERS = 170
 AI_MODEL = "gemini-2.5-flash-image"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-if GEMINI_API_KEY is None:
-    raise ValueError("GEMINI_API_KEY environment variable not set.")
-
 # Serial Communication
 SERIAL_PORT = "/dev/ttyACM0"
 BAUD_RATE = 115200
