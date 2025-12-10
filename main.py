@@ -2,9 +2,12 @@ from config.config import ASSET_DIR, BAUD_RATE, CANVAS_WIDTH_IN_MILLIMETERS, CAN
 from GCodeConverter import GCodeConverter
 from DrawMateStreamer import DrawMateStreamer
 from LineArtGenerator import LineArtGenerator
-from google.genai import errors
 from pathlib import Path
 import sys
+
+ALLOW_AI = False
+
+if ALLOW_AI: from google.genai import errors
 
 
 def main():
@@ -45,20 +48,34 @@ def main():
     # === AI Line Art Generation ===
     line_art_generator = LineArtGenerator()
 
-    try:
-        output_path = line_art_generator.generate(
-            Path(ASSET_DIR / "bird_canny.png"),
-            Path(CONFIG_DIR / "LineArtContinuationPrompt.md")
-        )
+    if ALLOW_AI:
+        try:
+            output_path = line_art_generator.generate(
+                Path(ASSET_DIR / "bird_canny.png"),
+                Path(CONFIG_DIR / "LineArtContinuationPrompt.md")
+            )
 
-        if output_path is None:
-            print("No image generated in response")
-        else:
-            print(f"Line art generated: {output_path}")
-    except errors.APIError as e:
-        print(f"API Error: {e.code}: {e.message}")
-    except FileNotFoundError as e:
-        print(e)
+            if output_path is None:
+                print("No image generated in response")
+            else:
+                print(f"Line art generated: {output_path}")
+        except errors.APIError as e:
+            print(f"API Error: {e.code}: {e.message}")
+        except FileNotFoundError as e:
+            print(e)
+    else:
+        try:
+            output_path = line_art_generator.generate(
+                Path(ASSET_DIR / "bird_canny.png"),
+                Path(CONFIG_DIR / "LineArtContinuationPrompt.md")
+            )
+
+            if output_path is None:
+                print("No image generated in response")
+            else:
+                print(f"Line art generated: {output_path}")
+        except FileNotFoundError as e:
+            print(e)
 
 
 if __name__ == "__main__":
