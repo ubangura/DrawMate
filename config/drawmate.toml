@@ -18,16 +18,16 @@ M2'''
 
 # Handle everything in segment_first
 segment_first = '''
-G0 Z10 ; pen up for travel
+G0 Z7 ; pen up for travel
 G0 X{x:.4f} Y{y:.4f} ; travel to start
-G0 Z0 ; pen down for drawing
+G0 Z3 ; pen down for drawing
 '''
 
 segment = "G1 X{x:.4f} Y{y:.4f}\n"
 
 segment_last = '''
 G1 X{x:.4f} Y{y:.4f}
-G0 Z10 ; pen up after path
+G0 Z7 ; pen up after path
 '''
 
 unit = "mm"
