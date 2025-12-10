@@ -32,68 +32,79 @@ class DrawMateStreamer:
     # Internal Helpers
     # -------------------------------
     def _connect(self):
-        """Establish and initialize the serial connection to GRBL."""
+        """Establish and initialize serial connection to GRBL."""
         print(f"📡 Connecting to GRBL on {self.port} at {self.baudrate} baud...")
+
         grbl = serial.Serial(self.port, self.baudrate, timeout=self.timeout)
-        grbl.write(b"\r\n\r\n")  # wake up GRBL
+        time.sleep(1)
+
+        # --- Soft reset (CTRL-X) ---
+        print("🔄 Sending soft reset (CTRL-X)...")
+        grbl.write(b"\x18")
         time.sleep(2)
 
-        # Read any startup text (like "Grbl 1.1h")
-        startup_msg = grbl.read_all().decode(errors="ignore").strip()
-        if startup_msg:
-            print(f"💬 Startup message:\n{startup_msg}\n")
+        # Read startup message
+        startup = grbl.read_all().decode(errors="ignore").strip()
+        if startup:
+            print(f"💬 Startup message:\n{startup}\n")
 
-        # Unlock if alarmed
-        print("🔓 Sending unlock command ($X)...")
+        # --- Unlock GRBL if alarmed ---
+        print("🔓 Unlocking GRBL ($X)...")
         grbl.write(b"$X\n")
         time.sleep(0.5)
         grbl.flushInput()
 
-        print("✅ GRBL ready to receive commands.\n")
+        print("✅ GRBL ready.\n")
         return grbl
 
+
     def _send_line(self, grbl, line: str):
-        """Send a single line of G-code and wait for a response."""
         grbl.write((line + "\n").encode())
         print(f"→ {line}")
 
-        response = grbl.readline().decode().strip()
-        while not response:
+        # Read response safely
+        for _ in range(40):  # ~4 seconds
             response = grbl.readline().decode().strip()
-        print(f"   ← {response}")
+            if response:
+                print(f"   ← {response}")
+                return
+
+        print("   ⚠️ No response received (timeout).")
+
 
     # -------------------------------
     # Public Method
     # -------------------------------
     def stream_gcode(self, gcode_path: Path):
-        """Stream a G-code file to GRBL."""
         gcode_path = Path(gcode_path)
+
         if not gcode_path.exists():
             print(f"[!] G-code file not found: {gcode_path}")
             return
 
         try:
-            with self._connect() as grbl, open(gcode_path, "r") as gfile:
-                print("🚀 Beginning G-code stream...\n")
+            grbl = self._connect()
+            print("🚀 Beginning G-code stream...\n")
 
+            with open(gcode_path, "r") as gfile:
                 for raw_line in gfile:
                     line = raw_line.strip()
-                    if not line or line.startswith(";"):  # skip comments
+                    if not line or line.startswith(";"):
                         continue
 
                     self._send_line(grbl, line)
-                    time.sleep(0.05)  # avoid GRBL buffer overflow
+                    time.sleep(0.05)
 
-                # Optional: soft reset GRBL after completion
-                grbl.write(b"\x18")
-                print("\n✅ Stream complete. GRBL reset and returning to idle.\n")
+            print("\n✅ G-code stream finished.")
+            grbl.close()
 
         except serial.SerialException as e:
             print(f"[!] Serial connection error: {e}")
         except KeyboardInterrupt:
-            print("\n⚠️ Interrupted by user. Stopping stream.")
+            print("\n⚠️ Interrupted by user.")
         except Exception as e:
             print(f"[!] Unexpected error: {e}")
+
 
 
 # -------------------------------
