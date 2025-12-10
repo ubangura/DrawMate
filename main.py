@@ -10,6 +10,9 @@ from pathlib import Path
 import sys
 
 AI_ENABLED = True
+ai_prompt_file = "stt_log.txt"
+#ai_prompt_file = "LineArtContinuationPrompt.md"
+
 
 # Only import AI components if enabled
 if AI_ENABLED:
@@ -45,7 +48,7 @@ def main():
             line_art_generator = LineArtGenerator()
             ai_output_path = line_art_generator.generate(
                 INPUT_IMAGE,
-                CONFIG_DIR / "LineArtContinuationPrompt.md"
+                CONFIG_DIR / ai_prompt_file
             )
 
             if ai_output_path:
