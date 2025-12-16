@@ -21,6 +21,7 @@ multiprocess==0.70.18
 numpy==2.2.6
 opencv-contrib-python==4.12.0.88
 pillow==12.0.0
+potrace==1.16
 pnoise==0.2.0
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
