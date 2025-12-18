@@ -2,7 +2,7 @@ from google import genai
 from PIL import Image
 from pathlib import Path
 from typing import Optional
-from config.config import AI_MODEL, ASSET_DIR, GEMINI_API_KEY
+from config.config import AI_MODEL, DATA_ASSET_DIR, GEMINI_API_KEY
 
 
 def _read_file_as_string(file_path: Path) -> str:
@@ -45,7 +45,7 @@ class LineArtGenerator:
                                                        ]
                                                        )
 
-        output_path = ASSET_DIR / (control_image_path.stem + "_continuation.png")
+        output_path = DATA_ASSET_DIR / (control_image_path.stem + "_continuation.png")
         for part in response.parts:
             if part.inline_data is not None:
                 generated_image = part.as_image()

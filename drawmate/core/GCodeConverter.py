@@ -7,6 +7,8 @@ Uses ImageMagick for preprocessing, Potrace for vectorization, and vpype for opt
 import subprocess
 from pathlib import Path
 
+from config.config import DRAWMATE_GCODE_PROFILE, DRAWMATE_GCODE_PROFILE_PATH
+
 
 class GCodeConverter:
     """
@@ -76,12 +78,19 @@ class GCodeConverter:
         try:
             subprocess.run([
                 "vpype",
-                "read", str(output_svg_path),
-                "linesimplify", "--tolerance", "0.2mm",
+                "read",
+                str(output_svg_path),
+                "linesimplify",
+                "--tolerance",
+                "0.2mm",
                 "linemerge",
                 "linesort",
-                "layout", "-m 3mm", "--landscape", f"{self.canvas_width_in_millimeters}x{self.canvas_height_in_millimeters}mm",
-                "write", str(output_svg_path),
+                "layout",
+                "-m 3mm",
+                "--landscape",
+                f"{self.canvas_width_in_millimeters}x{self.canvas_height_in_millimeters}mm",
+                "write",
+                str(output_svg_path),
             ], check=True, capture_output=True, text=True
             )
 
@@ -113,10 +122,10 @@ class GCodeConverter:
         try:
             subprocess.run([
                 "vpype",
-                "--config", str(Path("./config/drawmate.toml")),
+                "--config", DRAWMATE_GCODE_PROFILE_PATH,
                 "read", str(input_svg_path),
                 "gwrite",
-                "--profile", "drawmate",
+                "--profile", DRAWMATE_GCODE_PROFILE,
                 str(output_gcode_path),
             ], check=True, capture_output=True, text=True
             )

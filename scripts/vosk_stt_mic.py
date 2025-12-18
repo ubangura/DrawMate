@@ -7,6 +7,8 @@ import os
 from datetime import datetime
 from vosk import Model, KaldiRecognizer
 
+from config.config import LOG_DIR, VOICE_PROMPT_FILE
+
 # ----------------------
 # Global configuration
 # ----------------------
@@ -15,8 +17,7 @@ from vosk import Model, KaldiRecognizer
 MODEL_PATH = "/home/matthewandjun/stt_models/vosk-model-small-en-us-0.15"
 
 # 2) Logging directory & files
-LOG_DIR = "/home/matthewandjun/Desktop/DrawMate/config"
-LOG_FILE = os.path.join(LOG_DIR, "stt_log.txt")
+LOG_FILE = os.path.join(VOICE_PROMPT_FILE)
 LATEST_FILE = os.path.join(LOG_DIR, "latest_prompt.txt")
 
 # 3) Audio configuration
