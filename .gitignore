@@ -163,4 +163,6 @@ cython_debug/
 #.idea/
 
 # Ignore generated content
-data/
+data/assets/*
+data/gcode/*
+data/logs/*
