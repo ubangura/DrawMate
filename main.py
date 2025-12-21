@@ -1,22 +1,22 @@
 from config.config import (
     ASSET_DIR, BAUD_RATE, CANVAS_WIDTH_IN_MILLIMETERS,
-    CANVAS_HEIGHT_IN_MILLIMETERS, CONFIG_DIR, GCODE_DIR,
-    SERIAL_PORT, SERIAL_TIMEOUT_IN_SECONDS
+    CANVAS_HEIGHT_IN_MILLIMETERS, CONFIG_DIR, DATA_ASSET_DIR, GCODE_DIR,
+    SERIAL_PORT, SERIAL_TIMEOUT_IN_SECONDS, VOICE_PROMPT_FILE
 )
 
-from GCodeConverter import GCodeConverter
-from DrawMateStreamer import DrawMateStreamer
+from drawmate.core.GCodeConverter import GCodeConverter
+from drawmate.core.DrawMateStreamer import DrawMateStreamer
 from pathlib import Path
 import sys
 
 AI_ENABLED = True
-ai_prompt_file = "stt_log.txt"
-#ai_prompt_file = "LineArtContinuationPrompt.md"
+ai_prompt_file = VOICE_PROMPT_FILE
+# ai_prompt_file = CONFIG_DIR / "LineArtContinuationPrompt.md"
 
 
 # Only import AI components if enabled
 if AI_ENABLED:
-    from LineArtGenerator import LineArtGenerator
+    from drawmate.ai.LineArtGenerator import LineArtGenerator
     from google.genai import errors
 
 
@@ -34,7 +34,7 @@ def main():
 
     # --- Conversion pipeline ---
     gcode_converter = GCodeConverter(
-        ASSET_DIR,
+        DATA_ASSET_DIR,
         GCODE_DIR,
         CANVAS_WIDTH_IN_MILLIMETERS,
         CANVAS_HEIGHT_IN_MILLIMETERS
@@ -48,7 +48,7 @@ def main():
             line_art_generator = LineArtGenerator()
             ai_output_path = line_art_generator.generate(
                 INPUT_IMAGE,
-                CONFIG_DIR / ai_prompt_file
+                ai_prompt_file
             )
 
             if ai_output_path:
