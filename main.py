@@ -1,20 +1,13 @@
-from config.config import (
-    ASSET_DIR, BAUD_RATE, CANVAS_WIDTH_IN_MILLIMETERS,
-    CANVAS_HEIGHT_IN_MILLIMETERS, CONFIG_DIR, DATA_ASSET_DIR, GCODE_DIR,
-    SERIAL_PORT, SERIAL_TIMEOUT_IN_SECONDS, VOICE_PROMPT_FILE
-)
+from drawmate.config import config
 
 from drawmate.core.GCodeConverter import GCodeConverter
 from drawmate.core.DrawMateStreamer import DrawMateStreamer
 from pathlib import Path
 import sys
 
+config = config.get_config()
+
 AI_ENABLED = True
-ai_prompt_file = VOICE_PROMPT_FILE
-# ai_prompt_file = CONFIG_DIR / "LineArtContinuationPrompt.md"
-
-
-# Only import AI components if enabled
 if AI_ENABLED:
     from drawmate.ai.LineArtGenerator import LineArtGenerator
     from google.genai import errors
@@ -29,15 +22,15 @@ def main():
             return
         print(f"🖼️ Using input image: {INPUT_IMAGE}")
     else:
-        INPUT_IMAGE = ASSET_DIR / "bird.jpg"
+        INPUT_IMAGE = config.ASSET_DIR / "snowflake.png"
         print(f"🖼️ No image argument provided. Using default: {INPUT_IMAGE}")
 
     # --- Conversion pipeline ---
     gcode_converter = GCodeConverter(
-        DATA_ASSET_DIR,
-        GCODE_DIR,
-        CANVAS_WIDTH_IN_MILLIMETERS,
-        CANVAS_HEIGHT_IN_MILLIMETERS
+        config.DATA_ASSET_DIR,
+        config.GCODE_DIR,
+        config.CANVAS_WIDTH_IN_MILLIMETERS,
+        config.CANVAS_HEIGHT_IN_MILLIMETERS
     )
 
     # Immediately send the user image to LineArtGenerator and draw AI image
@@ -48,7 +41,7 @@ def main():
             line_art_generator = LineArtGenerator()
             ai_output_path = line_art_generator.generate(
                 INPUT_IMAGE,
-                ai_prompt_file
+                config.DEFAULT_PROMPT
             )
 
             if ai_output_path:
@@ -63,7 +56,6 @@ def main():
         print("🤖 AI features disabled. Skipping line-art generation.")
         return
 
-
     print("🖼️  Step 1: Converting raster to SVG...")
     svg_file_path = gcode_converter.raster_to_svg(ai_output_path if ai_output_path else INPUT_IMAGE)
 
@@ -74,7 +66,7 @@ def main():
 
     # --- Stream to DrawMate ---
     print("📡 Step 3: Streaming G-code to DrawMate...")
-    streamer = DrawMateStreamer(SERIAL_PORT, BAUD_RATE, SERIAL_TIMEOUT_IN_SECONDS)
+    streamer = DrawMateStreamer()
     streamer.stream_gcode(gcode_path)
 
     print("🎉 Done! The DrawMate should now be plotting.")

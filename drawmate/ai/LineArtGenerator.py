@@ -2,7 +2,10 @@ from google import genai
 from PIL import Image
 from pathlib import Path
 from typing import Optional
-from config.config import AI_MODEL, DATA_ASSET_DIR, GEMINI_API_KEY
+
+from drawmate.config import config
+
+config = config.get_config()
 
 
 def _read_file_as_string(file_path: Path) -> str:
@@ -15,8 +18,8 @@ def _read_file_as_string(file_path: Path) -> str:
 
 
 class LineArtGenerator:
-    def __init__(self, api_key: str = GEMINI_API_KEY):
-        self.client = genai.Client(api_key=api_key)
+    def __init__(self):
+        self.client = genai.Client(api_key=config.GEMINI_API_KEY)
 
     def generate(self, control_image_path: Path, continuation_prompt_path: Path) -> Optional[Path]:
         """
@@ -38,14 +41,14 @@ class LineArtGenerator:
         except FileNotFoundError:
             raise FileNotFoundError(f"Control image {control_image_path} does not exist.")
 
-        response = self.client.models.generate_content(model=AI_MODEL,
+        response = self.client.models.generate_content(model=config.AI_MODEL,
                                                        contents=[
                                                            _read_file_as_string(continuation_prompt_path),
                                                            control_image,
                                                        ]
                                                        )
 
-        output_path = DATA_ASSET_DIR / (control_image_path.stem + "_continuation.png")
+        output_path = config.DATA_ASSET_DIR / (control_image_path.stem + "_continuation.png")
         for part in response.parts:
             if part.inline_data is not None:
                 generated_image = part.as_image()

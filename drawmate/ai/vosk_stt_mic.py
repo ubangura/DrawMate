@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import sounddevice as sd
 import queue
 import sys
@@ -7,7 +6,9 @@ import os
 from datetime import datetime
 from vosk import Model, KaldiRecognizer
 
-from config.config import LOG_DIR, VOICE_PROMPT_FILE
+from drawmate.config import config
+
+config = config.get_config()
 
 # ----------------------
 # Global configuration
@@ -15,10 +16,6 @@ from config.config import LOG_DIR, VOICE_PROMPT_FILE
 
 # 1) Path to the English Vosk model
 MODEL_PATH = "/home/matthewandjun/stt_models/vosk-model-small-en-us-0.15"
-
-# 2) Logging directory & files
-LOG_FILE = os.path.join(VOICE_PROMPT_FILE)
-LATEST_FILE = os.path.join(LOG_DIR, "latest_prompt.txt")
 
 # 3) Audio configuration
 SAMPLE_RATE = 16000
@@ -31,16 +28,10 @@ q: "queue.Queue[bytes]" = queue.Queue()
 # --------------------------------------------------
 # Audio callback
 # --------------------------------------------------
-def audio_callback(indata, frames, time, status):
+def audio_callback(indata, status):
     """Called from the audio thread; push raw bytes into the queue."""
     if status:
         print(status, file=sys.stderr)
-
-    # If you want to debug volume, uncomment:
-    # import numpy as np
-    # vol = int(np.abs(indata).mean() * 10000)
-    # print("volume:", vol)
-
     q.put(bytes(indata))
 
 
@@ -67,19 +58,14 @@ def select_input_device() -> int | None:
 # Main STT logic
 # --------------------------------------------------
 def main() -> None:
-    # Check model exists
     if not os.path.exists(MODEL_PATH):
         print("Model folder not found:", MODEL_PATH)
         return
-
-    # Ensure log directory exists
-    os.makedirs(LOG_DIR, exist_ok=True)
 
     print("🎙 Loading Vosk English model... (may take a few seconds)")
     model = Model(MODEL_PATH)
     recognizer = KaldiRecognizer(model, SAMPLE_RATE)
 
-    # Pick a microphone device
     mic_device = select_input_device()
     if mic_device is None:
         return
@@ -108,29 +94,17 @@ def main() -> None:
                         if text:
                             print("▶ recognized:", text)
 
-                            # ----------------------------------------
-                            # Save to full log
-                            # ----------------------------------------
                             try:
-                                with open(LOG_FILE, "a", encoding="utf-8") as f:
+                                with open(config.VOICE_PROMPT_LOG, "a", encoding="utf-8") as f:
                                     f.write(f"{datetime.now().isoformat()}  {text}\n")
                             except Exception as e:
-                                print(f"Cannot write log file: {e}", file=sys.stderr)
+                                print(f"Cannot write voice prompt log file: {e}", file=sys.stderr)
 
-                            # ----------------------------------------
-                            # Save latest recognized line
-                            # ----------------------------------------
                             try:
-                                with open(LATEST_FILE, "w", encoding="utf-8") as f:
+                                with open(config.VOICE_PROMPT, "w", encoding="utf-8") as f:
                                     f.write(text + "\n")
                             except Exception as e:
-                                print(f"Cannot write latest prompt file: {e}", file=sys.stderr)
-                    else:
-                        # You can inspect partial results if you’d like:
-                        # partial = json.loads(recognizer.PartialResult()).get("partial", "")
-                        # if partial:
-                        #     print("… partial:", partial)
-                        pass
+                                print(f"Cannot write voice prompt file: {e}", file=sys.stderr)
 
             except KeyboardInterrupt:
                 print("\n🛑 Exiting.")

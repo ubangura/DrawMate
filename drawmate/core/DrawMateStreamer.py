@@ -19,23 +19,22 @@ import time
 import sys
 from pathlib import Path
 
+from drawmate.config import config
+
+config = config.get_config()
+
 
 class DrawMateStreamer:
     """Handles serial communication and G-code streaming to GRBL."""
-
-    def __init__(self, port: str, baudrate: int = 115200, timeout: int = 1):
-        self.port = port
-        self.baudrate = baudrate
-        self.timeout = timeout
 
     # -------------------------------
     # Internal Helpers
     # -------------------------------
     def _connect(self):
         """Establish and initialize serial connection to GRBL."""
-        print(f"📡 Connecting to GRBL on {self.port} at {self.baudrate} baud...")
+        print(f"📡 Connecting to GRBL on {config.SERIAL_PORT} at {config.BAUD_RATE} baud...")
 
-        grbl = serial.Serial(self.port, self.baudrate, timeout=self.timeout)
+        grbl = serial.Serial(config.SERIAL_PORT, config.BAUD_RATE, timeout=config.SERIAL_TIMEOUT_IN_SECONDS)
         time.sleep(1)
 
         # --- Soft reset (CTRL-X) ---
@@ -57,7 +56,6 @@ class DrawMateStreamer:
         print("✅ GRBL ready.\n")
         return grbl
 
-
     def _send_line(self, grbl, line: str):
         grbl.write((line + "\n").encode())
         print(f"→ {line}")
@@ -70,7 +68,6 @@ class DrawMateStreamer:
                 return
 
         print("   ⚠️ No response received (timeout).")
-
 
     # -------------------------------
     # Public Method
@@ -104,7 +101,6 @@ class DrawMateStreamer:
             print("\n⚠️ Interrupted by user.")
         except Exception as e:
             print(f"[!] Unexpected error: {e}")
-
 
 
 # -------------------------------
