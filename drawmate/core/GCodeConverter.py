@@ -6,9 +6,10 @@ Uses ImageMagick for preprocessing, Potrace for vectorization, and vpype for opt
 """
 import subprocess
 from pathlib import Path
+from drawmate.config import config
 
-from config.config import DRAWMATE_GCODE_PROFILE, DRAWMATE_GCODE_PROFILE_PATH
 
+config = config.get_config()
 
 class GCodeConverter:
     """
@@ -32,7 +33,6 @@ class GCodeConverter:
 
         self.asset_directory = asset_directory
         self.gcode_directory = gcode_directory
-        self.gcode_directory.mkdir(exist_ok=True)
 
     def raster_to_svg(self, input_image_path: Path) -> Path:
         """
@@ -122,10 +122,10 @@ class GCodeConverter:
         try:
             subprocess.run([
                 "vpype",
-                "--config", DRAWMATE_GCODE_PROFILE_PATH,
+                "--config", config.GCODE_PROFILE,
                 "read", str(input_svg_path),
                 "gwrite",
-                "--profile", DRAWMATE_GCODE_PROFILE,
+                "--profile", config.GCODE_PROFILE_NAME,
                 str(output_gcode_path),
             ], check=True, capture_output=True, text=True
             )
